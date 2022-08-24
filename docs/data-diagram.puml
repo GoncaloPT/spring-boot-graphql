@@ -1,0 +1,21 @@
+@startuml
+class Quiz{
+    id: ID
+    title: String
+    description: String
+}
+class Category{
+    id: ID
+    name: String
+    finished: boolean
+}
+class Question{
+    id: ID
+    text: String
+    answer: Optional<String>
+    mandatory: boolean
+}
+
+Quiz "1" -- "*" Category
+Category "1" -- "*" Question
+@enduml

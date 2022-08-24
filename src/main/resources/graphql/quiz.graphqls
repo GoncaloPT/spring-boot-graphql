@@ -1,0 +1,57 @@
+type Query {
+    quiz: [Quiz]
+    quizById(id: ID!): Quiz
+}
+
+type Mutation{
+    addQuiz(quiz: CreateQuiz): Quiz
+}
+
+
+"""
+Quiz is the questionnaire, the entity that aggregates all
+the categories.
+"""
+type Quiz{
+    id: ID
+    title: String!
+    description: String
+    categories: [Category]
+}
+input CreateQuiz{
+    title: String!
+    description: String
+    categories: [CreateCategory]
+}
+"""
+Category is logical grouping of questions that are expected to belong to a Quiz
+This is to showcase documentation on the schema...
+"""
+type Category{
+    id: ID
+    name: String!
+    finished: Boolean!
+    questions: [Question]!
+}
+input CreateCategory{
+    name: String!
+    finished: Boolean!
+    questions: [CreateQuestion]!
+}
+
+"""
+Questions are the center of the quiz.
+They should belong to a category
+"""
+type Question{
+    id: ID!,
+    text: String!,
+    answer: String,
+    mandatory: Boolean!
+}
+
+input CreateQuestion{
+    text: String!,
+    answer: String,
+    mandatory: Boolean!
+}
