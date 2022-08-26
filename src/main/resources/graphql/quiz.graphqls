@@ -2,12 +2,15 @@ type Query {
     """
     Company
     """
-    company: [Company]
-    companyFindById(id: ID!): Company
+    companyById( companyID : ID!): Company
+    companyByName( name : ID!): Company
+    companies: [Company]
+
     """
     Quiz
     """
     quiz: [Quiz]
+    quizFindById(id: ID!): Quiz
     quizByCompanyID(companyId: ID!): Quiz
     """
     QuizType

@@ -23,4 +23,18 @@ public class Category {
     @JoinColumn(name = "quiz_id",  referencedColumnName = "quiz_id")
     private Quiz quiz;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Category category = (Category) o;
+
+        return categoryId.equals(category.categoryId);
+    }
+
+    @Override
+    public int hashCode() {
+        return categoryId.hashCode();
+    }
 }

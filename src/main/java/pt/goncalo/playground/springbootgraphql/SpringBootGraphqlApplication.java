@@ -1,6 +1,9 @@
 package pt.goncalo.playground.springbootgraphql;
 
-import com.sun.istack.NotNull;
+
+import graphql.GraphQLError;
+import graphql.GraphqlErrorException;
+import graphql.schema.DataFetchingEnvironment;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +12,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.graphql.data.method.annotation.*;
+import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.graphql.execution.ErrorType;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import pt.goncalo.playground.springbootgraphql.messaging.QuizStreamController;
 import pt.goncalo.playground.springbootgraphql.repository.*;
@@ -43,7 +49,7 @@ public class SpringBootGraphqlApplication {
             /**
              * Company
              */
-            var createdCompany = companyRepository.saveAndFlush(new Company(UUID.randomUUID(), "my company"));
+            var createdCompany = companyRepository.save(new Company(UUID.randomUUID(), "my company"));
             log.info("created company: {}", createdCompany);
 
 
@@ -103,7 +109,24 @@ public class SpringBootGraphqlApplication {
 
 }
 
+@Component
+class GraphqlExceptionHandler extends DataFetcherExceptionResolverAdapter {
+    @Override
+    protected List<GraphQLError> resolveToMultipleErrors(Throwable ex, DataFetchingEnvironment env) {
+        return super.resolveToMultipleErrors(ex, env);
+    }
 
+    @Override
+    protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
+
+        return super.resolveToSingleError(ex, env);
+    }
+}
+
+/**
+ * QUIZ Repositories are not @GraphQlRepository ( by choice ) so we must map queries - define datahandlers - by hand.
+ * In this case we are using annotations to do it.
+ */
 @Controller
 class QuizController {
     private static final Logger log = LoggerFactory.getLogger("QuizController");
@@ -129,10 +152,32 @@ class QuizController {
 
     @QueryMapping
     Collection<Quiz> quiz() {
-
         return StreamSupport
                 .stream(quizRepository.findAll().spliterator(), false)
                 .toList();
+    }
+
+    /**
+     * Error handling example!
+     *
+     * <a href="https://docs.spring.io/spring-graphql/docs/current-SNAPSHOT/reference/html/index.html#execution-exceptions">
+     * For more
+     * </a>
+     *
+     * @param id
+     * @return
+     */
+    @QueryMapping
+    Quiz quizFindById(@Argument UUID id) {
+
+        return quizRepository
+                .findById(id)
+                .orElseThrow(() -> GraphqlErrorException
+                        .newErrorException()
+                        .errorClassification(ErrorType.NOT_FOUND)
+                        .build()
+                );
+
     }
 
     @SubscriptionMapping
@@ -154,7 +199,7 @@ class QuizController {
     }
 
     @QueryMapping
-    Quiz quizById(@NotNull @Argument UUID quizId) {
+    Quiz quizById(@Argument UUID quizId) {
 
         return quizRepository.findById(quizId).get();
     }
@@ -179,9 +224,9 @@ class QuizController {
                 .collect(Collectors.toMap(
                         quiz -> quiz,
                         quiz -> {
-                            log.info("TRYING TO FIND WITH ID #{}", quiz.getQuizId());
+                            //log.info("TRYING TO FIND WITH ID #{}", quiz.getQuizId());
                             var result = categoryRepository.findAllByQuiz_QuizId(quiz.getQuizId());
-                            log.info("result should be : {}", result);
+                            //log.info("result should be : {}", result);
                             return result;
                         }
                 ));
@@ -226,10 +271,6 @@ class QuizController {
 
 }
 
-@Controller
-class CategoryController {
-
-}
 
 record CreateQuiz(String title, String description, List<CreateCategory> categories,
                   UUID quizTypeID,

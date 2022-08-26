@@ -1,4 +1,4 @@
-package pt.goncalo.playground.springbootgraphql.flowtest
+package pt.goncalo.playground.springbootgraphql.integration
 
 
 import org.springframework.graphql.test.tester.HttpGraphQlTester
@@ -23,5 +23,11 @@ class GraphQlTestHelper {
         val url = "http://localhost:8080/graphql"
         val client: WebSocketClient = ReactorNettyWebSocketClient()
         return WebSocketGraphQlTester.builder(url, client).build()
+    }
+    infix fun <T> List<T>.equalsIgnoreOrder(other: List<T>) = this.size == other.size && this.toSet() == other.toSet()
+
+
+    interface DiffValue<T> {
+        val old : T?
     }
 }

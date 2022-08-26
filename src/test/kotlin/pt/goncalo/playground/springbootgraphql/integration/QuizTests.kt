@@ -1,5 +1,6 @@
-package pt.goncalo.playground.springbootgraphql.flowtest
+package pt.goncalo.playground.springbootgraphql.integration
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,17 +30,22 @@ class QuizTests @Autowired constructor(private val webApplicationContext: WebApp
               }
             }
             """
-            val result = tester
+            val getAllResult = tester
                 .document(getAllQuizDocument)
                 .execute()
+
+            val firstQuiz = getAllResult
                 .path("quiz")
                 .entityList(Quiz::class.java)
+                .get().get(0)
+            val firstQuizCategories = getAllResult
+                .path("quiz[*].categories[*]")
+                .entityList(Category::class.java)
                 .get()
-            val firstQuiz = result.get(0)
 
             val getQuizByIdDocument = """
             query getById{
-              quizById(quizId: "${firstQuiz.quizId}") {
+              quizFindById(id: "${firstQuiz.quizId}") {
                 quizId,title,description,categories{
                   categoryId,name
                 }
@@ -50,20 +56,24 @@ class QuizTests @Autowired constructor(private val webApplicationContext: WebApp
                 .document(getQuizByIdDocument)
                 .execute()
 
-
-             val getByIdQuiz = getByIdResponse
-                 .path("quizById")
+            val getByIdQuiz = getByIdResponse
+                .path("quizFindById")
                 .entity(Quiz::class.java)
                 .get()
 
-            val getByIdCategory = getByIdResponse
-                .path("quizById.categories[*]")
+            val getByIdCategories = getByIdResponse
+                .path("quizFindById.categories[*]")
                 .entityList(Category::class.java)
                 .get()
 
-            assertEquals(firstQuiz.quizId,getByIdQuiz.quizId)
-            assertEquals(firstQuiz.quizId,getByIdCategory.get(0).categoryId)
 
+            assertEquals(firstQuiz.quizId, getByIdQuiz.quizId)
+            println("firstQuizCategories $firstQuizCategories")
+            println("getByIdCategory $getByIdCategories")
+
+            firstQuizCategories.let {
+                assertThat(getByIdCategories equalsIgnoreOrder it).isTrue
+            }
 
 
         }
@@ -73,4 +83,5 @@ class QuizTests @Autowired constructor(private val webApplicationContext: WebApp
     fun `it should have consistent results between queries and subscription`() {
 
     }
+
 }
