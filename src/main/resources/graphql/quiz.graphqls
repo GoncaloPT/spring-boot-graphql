@@ -1,34 +1,63 @@
 type Query {
+    """
+    Company
+    """
+    company: [Company]
+    companyFindById(id: ID!): Company
+    """
+    Quiz
+    """
     quiz: [Quiz]
-    quizById(id: ID!): Quiz
+    quizByCompanyID(companyId: ID!): Quiz
+    """
+    QuizType
+    """
+    quizTypes: [QuizType]
+    quizTypesByName(name: String!): [QuizType]
+    quizTypeByQuizTypeId(quizTypeId: ID!): QuizType
+}
+type Subscription{
+    onQuizChange: Quiz
 }
 
 type Mutation{
-    addQuiz(quiz: CreateQuiz): Quiz
+    addQuiz(companyID: ID!, quiz: CreateQuiz): Quiz
 }
 
-
+"""
+One company or client or whatever.
+The goal is to aggregate Quiz.
+"""
+type Company{
+    companyID: ID!
+    name: String!
+    quizzes: [Quiz]
+}
 """
 Quiz is the questionnaire, the entity that aggregates all
 the categories.
 """
 type Quiz{
-    id: ID
+    quizId: ID
     title: String!
     description: String
     categories: [Category]
+    quizType: QuizType
+    company: Company
 }
 input CreateQuiz{
     title: String!
     description: String
     categories: [CreateCategory]
+    quizTypeId: ID!,
+    companyID: ID!
 }
 """
 Category is logical grouping of questions that are expected to belong to a Quiz
 This is to showcase documentation on the schema...
 """
 type Category{
-    id: ID
+    categoryId: ID
     name: String!
     finished: Boolean!
     questions: [Question]!
@@ -54,4 +83,15 @@ input CreateQuestion{
     text: String!,
     answer: String,
     mandatory: Boolean!
+}
+
+"""
+Quiz type - The type of the quiz, whatever that can be
+"""
+type QuizType{
+    quizTypeId: ID!,
+    name: String!
+}
+input CreateQuizType{
+    name: String!
 }

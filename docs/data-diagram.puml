@@ -1,4 +1,10 @@
 @startuml
+
+class Company{
+    companyID: ID
+    name: String
+
+}
 class Quiz{
     id: ID
     title: String
@@ -16,6 +22,13 @@ class Question{
     mandatory: boolean
 }
 
+class QuizType{
+    quizTypeId: ID
+    name: String
+}
+
+Company "1" -- "*" Quiz
 Quiz "1" -- "*" Category
+QuizType "1" -- "*" Quiz
 Category "1" -- "*" Question
 @enduml
