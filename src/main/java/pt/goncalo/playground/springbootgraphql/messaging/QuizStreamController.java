@@ -16,6 +16,7 @@ import reactor.core.publisher.FluxSink;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Stream;
@@ -49,21 +50,16 @@ public class QuizStreamController {
 
     }
 
-    private void generateSomeQuizzes() {
+    /**
+     * Just picks already existing quiz and sends them to the Sink.
+     */
+    private void generateSomeQuizzesFromDatabase() {
         try {
             generationMutex.acquire();
-
-            var company = compRepo.findAll().iterator().next();
-            var quizType = quizTypeRepository.findAll().iterator().next();
             Flux
                     .fromStream(
-                            Stream.generate(
-                                    () -> quizRepository.save(new Quiz(UUID.randomUUID(),
-                                            "new quiz@" + Instant.now(), "desc", quizType, company))
-                            ).map(quiz -> {
-                                categoryRepository.save(new Category(UUID.randomUUID(), "cat.tile", false, quiz));
-                                return quiz;
-                            })
+                            Stream.generate(quizRepository::findAll)
+                                    .flatMap(Collection::stream)
                     )
                     .doFinally((c) -> generationMutex.release())
                     .delayElements(Duration.ofSeconds(1)).take(10)
@@ -78,7 +74,7 @@ public class QuizStreamController {
     }
 
     public ConnectableFlux<Quiz> getStream() {
-        generateSomeQuizzes();
+        generateSomeQuizzesFromDatabase();
         return stream;
     }
 

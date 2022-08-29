@@ -93,6 +93,11 @@
             <artifactId>spring-graphql-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- kotlin -->
         <dependency>

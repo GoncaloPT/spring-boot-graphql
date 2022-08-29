@@ -24,7 +24,7 @@ type Subscription{
 }
 
 type Mutation{
-    addQuiz(companyID: ID!, quiz: CreateQuiz): Quiz
+    addQuiz(quiz: CreateQuiz): Quiz
 }
 
 """

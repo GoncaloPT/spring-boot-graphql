@@ -28,8 +28,9 @@ They can be found at test/kotlin folder.
 
 The Tests will make sure the API has consistent outputs:
 - A random listAll element can be searched byId and the values will match
-- A value obtain on a subscription and one obtained in a query ( using same document ) are consistent
 - After a mutation, query returns expected ( updated ) value
+- A value obtain on a subscription and one obtained in a query ( using same document ) are consistent
+
 
 ## Presentation
 

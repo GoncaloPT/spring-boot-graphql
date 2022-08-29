@@ -73,8 +73,12 @@ public class SpringBootGraphqlApplication {
             quizRepository.saveAll(List.of(
                     new Quiz(UUID.randomUUID(), "Quiz Title 1", "Normal description",
                             quizTypeRepo.findAll().get(0),
+                            createdCompany),
+                    new Quiz(UUID.randomUUID(), "Quiz Title 2", "Not that normal description",
+                            quizTypeRepo.findAll().get(0),
                             createdCompany)
             ));
+
 
             /**
              * Category, each quiz will have two
@@ -188,8 +192,8 @@ class QuizController {
 
 
     @MutationMapping
-    Quiz addQuiz(@Argument UUID companyID, @Argument CreateQuiz quiz) {
-        log.info("add quiz called for {} with {}", companyID, quiz);
+    Quiz addQuiz(@Argument CreateQuiz quiz) {
+        log.info("add quiz called for {} ", quiz);
         Quiz q = quiz.asQuiz(
                 typeId -> quizTypeRepository.findById(typeId).get(),
                 cID -> companyRepository.findById(cID).get(),
@@ -217,8 +221,6 @@ class QuizController {
                 .stream()
                 .map(Quiz::getQuizId).toList();
         log.info("BatchMapping categories called for ids #[{}]", idsToFetch);
-
-
         return quizRepository
                 .findAllById(idsToFetch).stream()
                 .collect(Collectors.toMap(
@@ -273,7 +275,7 @@ class QuizController {
 
 
 record CreateQuiz(String title, String description, List<CreateCategory> categories,
-                  UUID quizTypeID,
+                  UUID quizTypeId,
                   UUID companyID) {
     /**
      * Boundary converter
@@ -283,7 +285,7 @@ record CreateQuiz(String title, String description, List<CreateCategory> categor
      */
     Quiz asQuiz(Function<UUID, QuizType> typeSupplier,
                 Function<UUID, Company> companySupplier, UUID uuid) {
-        return new Quiz(uuid, title, description, typeSupplier.apply(quizTypeID), companySupplier.apply(companyID));
+        return new Quiz(uuid, title, description, typeSupplier.apply(quizTypeId), companySupplier.apply(companyID));
     }
 }
 
