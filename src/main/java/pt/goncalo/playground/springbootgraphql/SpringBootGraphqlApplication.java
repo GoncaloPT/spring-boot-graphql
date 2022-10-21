@@ -16,6 +16,7 @@ import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import pt.goncalo.playground.springbootgraphql.messaging.QuizStreamController;
 import pt.goncalo.playground.springbootgraphql.repository.*;
 import pt.goncalo.playground.springbootgraphql.repository.entity.*;
@@ -37,7 +38,7 @@ public class SpringBootGraphqlApplication {
         SpringApplication.run(SpringBootGraphqlApplication.class, args);
     }
 
-    @Bean
+    //@Bean
     ApplicationRunner applicationRunner(QuizRepository quizRepository,
                                         QuizTypeRepository quizTypeRepo,
                                         QuestionRepository questionRepository,

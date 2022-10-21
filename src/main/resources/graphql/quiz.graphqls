@@ -13,6 +13,11 @@ type Query {
     quizFindById(id: ID!): Quiz
     quizByCompanyID(companyId: ID!): Quiz
     """
+    Categories
+    """
+    categories: [Category]
+    categoryById(categoryId: ID!): Category
+    """
     QuizType
     """
     quizTypes: [QuizType]
@@ -21,6 +26,7 @@ type Query {
 }
 type Subscription{
     onQuizChange: Quiz
+
 }
 
 type Mutation{
@@ -34,14 +40,13 @@ The goal is to aggregate Quiz.
 type Company{
     companyID: ID!
     name: String!
-    quizzes: [Quiz]
 }
 """
 Quiz is the questionnaire, the entity that aggregates all
 the categories.
 """
 type Quiz{
-    quizId: ID
+    quizId: ID!
     title: String!
     description: String
     categories: [Category]
@@ -64,6 +69,7 @@ type Category{
     name: String!
     finished: Boolean!
     questions: [Question]!
+    quiz: Quiz
 }
 input CreateCategory{
     name: String!

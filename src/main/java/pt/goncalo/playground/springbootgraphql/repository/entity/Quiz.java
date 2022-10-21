@@ -15,16 +15,17 @@ import java.util.UUID;
 public class Quiz {
     @Id
     @Column(name = "quiz_id", nullable = false, columnDefinition = "uuid")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID quizId;
     private String title;
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "quiz_type_id",  referencedColumnName = "quiz_type_id", nullable = false)
     private QuizType type;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "company_id",  referencedColumnName = "company_id", nullable = false)
     private Company company;
 

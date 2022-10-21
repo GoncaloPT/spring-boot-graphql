@@ -40,10 +40,9 @@ class QuizTests @Autowired constructor(private val webApplicationContext: WebApp
                 .execute()
 
             val firstQuiz = getAllResult
-                .path("quiz")
-                .entityList(Quiz::class.java)
+                .path("quiz[0]")
+                .entity(Quiz::class.java)
                 .get()
-                .get(0)
             val firstQuizCategories = getAllResult
                 .path("quiz[0].categories[*]")
                 .entityList(Category::class.java)

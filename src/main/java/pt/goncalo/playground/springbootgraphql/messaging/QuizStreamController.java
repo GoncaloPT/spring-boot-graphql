@@ -7,7 +7,6 @@ import pt.goncalo.playground.springbootgraphql.repository.CategoryRepository;
 import pt.goncalo.playground.springbootgraphql.repository.CompanyRepository;
 import pt.goncalo.playground.springbootgraphql.repository.QuizRepository;
 import pt.goncalo.playground.springbootgraphql.repository.QuizTypeRepository;
-import pt.goncalo.playground.springbootgraphql.repository.entity.Category;
 import pt.goncalo.playground.springbootgraphql.repository.entity.Quiz;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
@@ -15,9 +14,7 @@ import reactor.core.publisher.FluxSink;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Stream;
 
@@ -42,7 +39,6 @@ public class QuizStreamController {
     @PostConstruct
     public void postConstruct() {
         log.info("postConstruct called");
-
         Flux<Quiz> innerPublisher = Flux.create(emitter -> sink = emitter);
         stream = innerPublisher.publish();
         stream.connect();

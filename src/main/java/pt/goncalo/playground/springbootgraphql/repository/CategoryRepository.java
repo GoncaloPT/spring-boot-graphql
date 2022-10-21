@@ -14,4 +14,6 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID>, QuerydslPredicateExecutor<Category> {
     Collection<Category> findAllByQuiz_QuizId(UUID quizID);
 
+
+
 }
