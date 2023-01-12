@@ -1,9 +1,8 @@
 package pt.goncalo.playground.springbootgraphql.repository.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity

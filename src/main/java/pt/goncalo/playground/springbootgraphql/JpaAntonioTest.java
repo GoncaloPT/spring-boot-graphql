@@ -4,12 +4,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import pt.goncalo.playground.springbootgraphql.repository.QuizRepository;
-import pt.goncalo.playground.springbootgraphql.repository.QuizTypeRepository;
 import pt.goncalo.playground.springbootgraphql.repository.entity.Company;
 import pt.goncalo.playground.springbootgraphql.repository.entity.Quiz;
 import pt.goncalo.playground.springbootgraphql.repository.entity.QuizType;
-
-import java.util.UUID;
 
 @Component
 public class JpaAntonioTest implements ApplicationRunner {
@@ -26,6 +23,5 @@ public class JpaAntonioTest implements ApplicationRunner {
         var quiz = new Quiz(null,"title", "description",quizType, company);
 
         var createdQuiz = quizRepository.save(quiz);
-        System.out.println("created quiz is: " + createdQuiz);
     }
 }
