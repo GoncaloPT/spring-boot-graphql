@@ -15,6 +15,7 @@ import reactor.core.publisher.FluxSink;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Stream;
 
@@ -50,6 +51,7 @@ public class QuizStreamController {
      * Just picks already existing quiz and sends them to the Sink.
      */
     private void generateSomeQuizzesFromDatabase() {
+        var r = new Random(10);
         try {
             generationMutex.acquire();
             Flux
@@ -57,6 +59,10 @@ public class QuizStreamController {
                             Stream.generate(quizRepository::findAll)
                                     .flatMap(Collection::stream)
                     )
+                    .map(quiz -> {
+                        quiz.setTitle("title " + r.nextInt());
+                        return quiz;
+                    })
                     .doFinally((c) -> generationMutex.release())
                     .delayElements(Duration.ofSeconds(1)).take(10)
                     .subscribe(quiz -> {

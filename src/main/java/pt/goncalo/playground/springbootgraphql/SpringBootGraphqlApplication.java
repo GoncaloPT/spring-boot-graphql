@@ -10,13 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.graphql.data.ArgumentValue;
 import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import pt.goncalo.playground.springbootgraphql.messaging.QuizStreamController;
 import pt.goncalo.playground.springbootgraphql.repository.*;
 import pt.goncalo.playground.springbootgraphql.repository.entity.*;
@@ -203,8 +202,26 @@ class QuizController {
         return quizRepository.save(q);
     }
 
+    /**
+     * To demonstrate how would a 'patch' style operation could be implemented.
+     * The main distinction needed is to differentiate null arguments from not provided arguments.
+     * A null argument means the field should be set to null in the persistence layer, the
+     * non provided argument means we dont want to change current persisted value.
+     *
+     * Note: The name of the method is the mutation name.
+     * @return Quiz
+     */
+    @MutationMapping()
+    Quiz patchQuiz(PatchQuiz quiz){
+
+        var dbQuiz = quizRepository.findById(quiz.quizId()).orElseThrow();
+        var updated = quiz.mergeWithDbQuiz(dbQuiz);
+        return quizRepository.save(updated);
+    }
+
     @QueryMapping
     Quiz quizById(@Argument UUID quizId) {
+
 
         return quizRepository.findById(quizId).get();
     }
@@ -289,6 +306,20 @@ record CreateQuiz(String title, String description, List<CreateCategory> categor
         return new Quiz(uuid, title, description, typeSupplier.apply(quizTypeId), companySupplier.apply(companyID));
     }
 }
+record PatchQuiz(UUID quizId, ArgumentValue<String> title,
+                 ArgumentValue<String> description,
+                 ArgumentValue<List<CreateCategory>> categories){
+    Quiz mergeWithDbQuiz(Quiz dbQuiz){
+        return new Quiz(
+                dbQuiz.getQuizId(),
+                title.asOptional().orElse(dbQuiz.getTitle()),
+                description.asOptional().orElse(dbQuiz.getDescription()),
+                dbQuiz.getType(),
+                dbQuiz.getCompany()
+        );
+    }
+
+}
 
 
 record CreateCategory(String name, boolean finished, List<CreateQuestion> questions) {
@@ -297,3 +328,4 @@ record CreateCategory(String name, boolean finished, List<CreateQuestion> questi
 
 record CreateQuestion(String text, String answer) {
 }
+
