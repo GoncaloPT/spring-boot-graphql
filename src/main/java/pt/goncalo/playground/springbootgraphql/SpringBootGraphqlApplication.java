@@ -191,6 +191,7 @@ class QuizController {
     }
 
 
+
     @MutationMapping
     Quiz addQuiz(@Argument CreateQuiz quiz) {
         log.info("add quiz called for {} ", quiz);
